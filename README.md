@@ -36,6 +36,57 @@ sudo ./crealitycamflash.py raw cmd sfwritekernel
 sudo ./crealitycamflash.py raw cmd reboot
 ```
 
+## K1 users: flashing from the printer
+
+A rooted K1 already has what the tool needs, so the camera can be flashed while it's plugged into the printer, with no PC involved.
+
+### Install
+
+SSH into the printer as root, then:
+
+```sh
+cd /usr/data
+git clone https://github.com/Cartrigger/creality-camera-flasher-tux.git
+cd creality-camera-flasher-tux
+chmod +x crealitycamflash.py
+```
+
+To update later: `cd /usr/data/creality-camera-flasher-tux && git pull`.
+
+### Copy the firmware over
+
+Extract the firmware zip on your computer, then copy the folder that holds `auto_update.txt` to the printer. From your computer, using your printer's IP:
+
+```sh
+scp -r K1_CAM_FIX root@<printer-ip>:/usr/data/
+```
+
+On Windows, WinSCP works too: drop the folder into `/usr/data`.
+
+### Flash
+
+You're already root on the printer, so no `sudo`:
+
+```sh
+cd /usr/data/creality-camera-flasher-tux
+./crealitycamflash.py list                       # the camera should show up
+./crealitycamflash.py version                    # current firmware
+./crealitycamflash.py -n flash /usr/data/K1_CAM_FIX   # dry run: shows the steps, sends nothing
+./crealitycamflash.py flash /usr/data/K1_CAM_FIX      # the real thing
+```
+
+The flash takes about two minutes, then the camera reboots. Don't power off the printer or unplug the camera while it runs. When it's done, run `version` again to see the new firmware. If the camera feed doesn't come back on its own, restart the printer.
+
+### If it stops at "waiting for the camera to come back as an update disk"
+
+The camera switched to update mode, but the printer didn't pick it up as a USB disk. Check that the printer's kernel has USB storage:
+
+```sh
+ls /sys/bus/usb/drivers | grep usb-storage
+```
+
+If that prints nothing, the printer can't flash it; use a Linux PC or a Raspberry Pi instead. The camera stays in update mode until it's power-cycled, so unplug it and plug it back in to get it working normally again.
+
 ## Requirements
 
 - The `uvcvideo` and `usb-storage` kernel modules, which nearly every desktop distribution already has. `sg` (`/dev/sg*`) is used if it's loaded; otherwise the tool falls back to `/dev/sd*`.
