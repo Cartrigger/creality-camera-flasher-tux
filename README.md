@@ -4,6 +4,8 @@ A Linux command-line replacement for Sigmastar's Windows `USBDownloadTool.exe`, 
 
 Only Python 3 is needed; nothing has to be installed.
 
+Tested on a K1 SE, flashing its Nebula camera from the printer itself. The firmware for that camera is included in [`K1_CAM_FIX`](K1_CAM_FIX), with its own flashing steps.
+
 ## Usage
 
 Run it as root: the update talks to the camera with raw SCSI commands, which Linux allows only for root.
@@ -46,16 +48,16 @@ SSH into the printer as root, then:
 
 ```sh
 cd /usr/data
-git clone https://github.com/Cartrigger/creality-camera-flasher-tux.git
+git clone -b k1-nebula-cam https://github.com/Cartrigger/creality-camera-flasher-tux.git
 cd creality-camera-flasher-tux
 chmod +x crealitycamflash.py
 ```
 
 To update later: `cd /usr/data/creality-camera-flasher-tux && git pull`.
 
-### Copy the firmware over
+### Firmware
 
-Extract the firmware zip on your computer, then copy the folder that holds `auto_update.txt` to the printer. From your computer, using your printer's IP:
+The Nebula camera firmware comes with the clone, in `K1_CAM_FIX`, so there's nothing to copy for that camera. For other firmware, extract its zip on your computer and copy the folder that holds `auto_update.txt` to the printer. From your computer, using your printer's IP:
 
 ```sh
 scp -r K1_CAM_FIX root@<printer-ip>:/usr/data/
@@ -65,17 +67,17 @@ On Windows, WinSCP works too: drop the folder into `/usr/data`.
 
 ### Flash
 
-You're already root on the printer, so no `sudo`:
+You're already root on the printer, so no `sudo`. Stop the webcam stream first; on printers set up with Simple AF that's `/etc/init.d/S50webcam stop`.
 
 ```sh
 cd /usr/data/creality-camera-flasher-tux
-./crealitycamflash.py list                       # the camera should show up
-./crealitycamflash.py version                    # current firmware
-./crealitycamflash.py -n flash /usr/data/K1_CAM_FIX   # dry run: shows the steps, sends nothing
-./crealitycamflash.py flash /usr/data/K1_CAM_FIX      # the real thing
+./crealitycamflash.py list                 # the camera should show up
+./crealitycamflash.py version              # current firmware
+./crealitycamflash.py -n flash K1_CAM_FIX  # dry run: shows the steps, sends nothing
+./crealitycamflash.py flash K1_CAM_FIX     # the real thing
 ```
 
-The flash takes about two minutes, then the camera reboots. Don't power off the printer or unplug the camera while it runs. When it's done, run `version` again to see the new firmware. If the camera feed doesn't come back on its own, restart the printer.
+The flash takes about two minutes, then the camera reboots. Don't power off the printer or unplug the camera while it runs. When it's done, run `version` again to see the new firmware, and start the stream again (`/etc/init.d/S50webcam start`). If the camera feed doesn't come back, restart the printer.
 
 ### If it stops at "waiting for the camera to come back as an update disk"
 
@@ -108,10 +110,12 @@ If that prints nothing, the printer can't flash it; use a Linux PC or a Raspberr
 
 4. `auto_update.txt` is run line by line. Lines starting with `#` or `%` are comments. `tftp <address in hex> <file>` uploads a file, `estar <script>` runs another script, and any other line is sent as a command.
 
-## Untested paths
+## Tested
 
-It has been checked against the Windows tool's code and with dry runs, but not yet on a camera. `--boot` (boot ROM recovery) copies a path the Windows tool has but doesn't use in its interface, so treat it as experimental.
+- K1 SE, flashing from the printer: the Nebula camera (CCX2F3299 on `250422V031`) took the `K1_CAM_FIX` firmware and came back as CCX2F3298 on `240103V020`, streaming normally.
+
+`--boot` (boot ROM recovery) hasn't been tested. It copies a path the Windows tool has but doesn't use in its interface, so treat it as experimental.
 
 ## License
 
-MIT; see [LICENSE](LICENSE). Firmware files aren't included; they belong to their vendors.
+MIT; see [LICENSE](LICENSE). The license covers the tool only. The firmware in `K1_CAM_FIX` is Creality's, from their camera flashing kit.

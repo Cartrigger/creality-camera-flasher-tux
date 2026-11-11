@@ -1,0 +1,5 @@
+tftp 0 uImage
+sfwritekernel
+tftp 0x1 appfs.jffs2
+sfwriteappfs
+reboot
