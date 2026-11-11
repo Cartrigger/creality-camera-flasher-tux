@@ -19,13 +19,7 @@ cd creality-camera-flasher-tux
 chmod +x crealitycamflash.py
 ```
 
-Stop whatever is streaming from the camera. On printers set up with Simple AF:
-
-```sh
-/etc/init.d/S50webcam stop
-```
-
-Check the camera is seen, do a dry run, then flash:
+The webcam stream can stay running. Check the camera is seen, do a dry run, then flash:
 
 ```sh
 ./crealitycamflash.py version
@@ -33,11 +27,10 @@ Check the camera is seen, do a dry run, then flash:
 ./crealitycamflash.py flash K1_CAM_FIX
 ```
 
-It takes about two minutes. Don't power off the printer or unplug the camera while it runs. The camera reboots by itself at the end; then check it and start streaming again:
+It takes about two minutes. Don't power off the printer or unplug the camera while it runs. The camera reboots by itself at the end and the stream picks it back up; check the new version with:
 
 ```sh
 ./crealitycamflash.py version
-/etc/init.d/S50webcam start
 ```
 
 With `-v`, the last step may print `reboot: [Errno 5] SG_IO host 0x7`. That's the camera dropping off USB as it reboots, and it's expected.

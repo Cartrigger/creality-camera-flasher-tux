@@ -67,7 +67,7 @@ On Windows, WinSCP works too: drop the folder into `/usr/data`.
 
 ### Flash
 
-You're already root on the printer, so no `sudo`. Stop the webcam stream first; on printers set up with Simple AF that's `/etc/init.d/S50webcam stop`.
+You're already root on the printer, so no `sudo`. The webcam stream can stay running.
 
 ```sh
 cd /usr/data/creality-camera-flasher-tux
@@ -77,7 +77,7 @@ cd /usr/data/creality-camera-flasher-tux
 ./crealitycamflash.py flash K1_CAM_FIX     # the real thing
 ```
 
-The flash takes about two minutes, then the camera reboots. Don't power off the printer or unplug the camera while it runs. When it's done, run `version` again to see the new firmware, and start the stream again (`/etc/init.d/S50webcam start`). If the camera feed doesn't come back, restart the printer.
+The flash takes about two minutes, then the camera reboots. Don't power off the printer or unplug the camera while it runs. When it's done, run `version` again to see the new firmware. If the camera feed doesn't come back, restart the printer.
 
 ### If it stops at "waiting for the camera to come back as an update disk"
 
